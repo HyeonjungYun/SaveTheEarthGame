@@ -60,7 +60,8 @@ def create_asteroid():
     asteroid_x_pos = random.randint(0, screen_width - asteroid_img.get_rect().width)
     asteroid_y_pos = 0 - asteroid_img.get_rect().width
     asteroid_speed = random.randint(5, 15)
-    return [asteroid_img, asteroid_x_pos, asteroid_y_pos, asteroid_speed]
+    asteroid_hp = 3  # 운석의 체력을 3으로 설정
+    return [asteroid_img, asteroid_x_pos, asteroid_y_pos, asteroid_speed, asteroid_hp]
 
 # 게임 오버 화면 출력 함수
 def game_over():
@@ -99,7 +100,7 @@ while running:
         asteroids.append(create_asteroid())
 
     # 운석 위치 업데이트
-    asteroids = [[a[0], a[1], a[2] + a[3], a[3]] for a in asteroids if a[2] < screen_height]
+    asteroids = [[a[0], a[1], a[2] + a[3], a[3], a[4]] for a in asteroids if a[2] < screen_height]
 
     # 충돌 처리
     for missile in missiles:
@@ -107,8 +108,10 @@ while running:
             if (missile[0] > asteroid[1] and missile[0] < asteroid[1] + asteroid[0].get_rect().width) and \
                (missile[1] > asteroid[2] and missile[1] < asteroid[2] + asteroid[0].get_rect().height):
                 missiles.remove(missile)
-                asteroids.remove(asteroid)
-                explosions.append([explosion_image, asteroid[1], asteroid[2], pygame.time.get_ticks()])
+                asteroid[4] -= 1  # 운석의 체력 감소
+                if asteroid[4] <= 0:
+                    asteroids.remove(asteroid)
+                    explosions.append([explosion_image, asteroid[1], asteroid[2], pygame.time.get_ticks()])
                 break
 
     # 전투기와 운석 충돌 처리
