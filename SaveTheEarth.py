@@ -80,14 +80,14 @@ def create_asteroid():
 # 게임 오버 화면 출력 함수
 def game_over():
     global is_game_over, total_score
+    screen.fill((0, 0, 0))
     font = pygame.font.Font(None, 74)
     text = font.render("Game Over", True, (255, 0, 0))
-    screen.blit(text, (screen_width / 2 - text.get_width() / 2, screen_height / 2 - text.get_height() / 2))
-    restart_button = draw_button('Restart', screen_width / 2, screen_height / 2 - 50)
-    quit_button = draw_button('Quit', screen_width / 2, screen_height / 2 + 50)
+    screen.blit(text, (screen_width / 2 - text.get_width() / 2, screen_height / 2 - text.get_height() - 20))
+    restart_button = draw_button('Restart', screen_width / 2, screen_height / 2 + 10)
+    quit_button = draw_button('Quit', screen_width / 2, screen_height / 2 + 70)
 
     #게임 오버시 점수 표시
-    #게임오버시 뜨는 점수
     font_s = pygame.font.Font(None, 36)
     text_s = font.render("Score: " + str(total_score), True, (0, 0, 255))
     screen.blit(text_s, (screen_width / 2 - text.get_width() / 2, 250))
@@ -120,8 +120,12 @@ def draw_button(button_text, center_x, center_y, action=None):
 
 # 게임 시작 화면
 def start_screen():
-    start_button = draw_button("Game Start", screen_width / 2, screen_height / 2 - 50)
-    quit_button = draw_button("Quit", screen_width / 2, screen_height / 2 + 50)
+    screen.fill((0, 0, 0))
+    font = pygame.font.Font(None, 74)
+    text = font.render("Save the Earth!!!", True, (0, 255, 0))
+    screen.blit(text, (screen_width / 2 - text.get_width() / 2, screen_height / 2 - text.get_height() - 20))
+    start_button = draw_button("Game Start", screen_width / 2, screen_height / 2 + 10)
+    quit_button = draw_button("Quit", screen_width / 2, screen_height / 2 + 70)
     pygame.display.update()
     while True:
         for event in pygame.event.get():
@@ -162,7 +166,6 @@ def game_play():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     missile_x_pos = fighter_x_pos + (fighter_width / 2) - (missile_width / 2)
