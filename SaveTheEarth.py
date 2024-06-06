@@ -64,6 +64,10 @@ heart_size = heart_image.get_rect().size
 heart_width = heart_size[0]
 heart_height = heart_size[1]
 
+#점수 변수 -운석의 낙하 속도에 따라 점수가 다름
+total_score = 0
+speed_bonus = 0
+
 # 운석 생성 함수
 def create_asteroid():
     asteroid_img = pygame.image.load(random.choice(asteroid_images))
@@ -75,12 +79,19 @@ def create_asteroid():
 
 # 게임 오버 화면 출력 함수
 def game_over():
-    global is_game_over
+    global is_game_over, total_score
     font = pygame.font.Font(None, 74)
     text = font.render("Game Over", True, (255, 0, 0))
     screen.blit(text, (screen_width / 2 - text.get_width() / 2, screen_height / 2 - text.get_height() / 2))
     restart_button = draw_button('Restart', screen_width / 2, screen_height / 2 - 50)
     quit_button = draw_button('Quit', screen_width / 2, screen_height / 2 + 50)
+
+    #게임 오버시 점수 표시
+    #게임오버시 뜨는 점수
+    font_s = pygame.font.Font(None, 36)
+    text_s = font.render("Score: " + str(total_score), True, (0, 0, 255))
+    screen.blit(text_s, (screen_width / 2 - text.get_width() / 2, 250))
+    
     pygame.display.update()
     
     while True:
@@ -88,7 +99,9 @@ def game_over():
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if restart_button.collidepoint(event.pos):
                     is_game_over = False
+                    total_score = 0
                     return  # 게임 재시작
+                
                 elif quit_button.collidepoint(event.pos):
                     pygame.quit()  # 게임 종료
             elif event.type == pygame.QUIT:
@@ -120,9 +133,22 @@ def start_screen():
             elif event.type == pygame.QUIT:
                 pygame.quit()
 
+#인게임 점수판
+def show_score():
+    global total_score
+    font = pygame.font.Font(None, 36)
+    text = font.render("Score: " + str(total_score), True, (255, 255, 255))
+    screen.blit(text, (screen_width / 2 - text.get_width() / 2, 20))
+#점수 획득 - 낙하속도에 따라 점수량 다름
+def get_score(speed_bonus):
+    global total_score
+    basic_score = 10
+    total_score += basic_score * speed_bonus
+
+
 # 게임 플레이 함수
 def game_play():
-    global missiles, asteroids, explosions, fighter_x_pos, fighter_y_pos, is_game_over, lives
+    global missiles, asteroids, explosions, fighter_x_pos, fighter_y_pos, is_game_over, lives, total_score, speed_bonus
     # 우주선 운석 위치 조정 및 재조정
     fighter_x_pos = (screen_width / 2) - (fighter_width / 2)
     fighter_y_pos = screen_height - fighter_height - 10
@@ -170,6 +196,8 @@ def game_play():
                     if asteroid[4] <= 0:
                         asteroids.remove(asteroid)
                         explosions.append([explosion_image, asteroid[1], asteroid[2], pygame.time.get_ticks()])
+                        
+                        get_score(asteroid[3])
                     break
 
         # 전투기와 운석 충돌 처리
@@ -186,6 +214,15 @@ def game_play():
         # 화면 그리기
         screen.blit(background, (0, 0))
         screen.blit(fighter, (fighter_x_pos, fighter_y_pos))
+
+        for missile in missiles:
+            screen.blit(missile_image, (missile[0], missile[1]))
+
+        for asteroid in asteroids:
+            screen.blit(asteroid[0], (asteroid[1], asteroid[2]))
+
+        #인게임점수
+        show_score()
 
         for missile in missiles:
             screen.blit(missile_image, (missile[0], missile[1]))
