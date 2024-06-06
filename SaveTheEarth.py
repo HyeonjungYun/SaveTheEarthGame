@@ -104,7 +104,6 @@ def game_over():
                 
                 elif quit_button.collidepoint(event.pos):
                     pygame.quit()  # 게임 종료
-                    
             elif event.type == pygame.QUIT:
                 pygame.quit()
         pygame.display.update()
