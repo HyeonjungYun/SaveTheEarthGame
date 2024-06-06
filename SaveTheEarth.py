@@ -3,6 +3,8 @@ import random
 
 # 게임 초기화
 pygame.init()
+is_game_over = False
+
 
 # 화면 설정
 screen_width = 800
@@ -64,79 +66,127 @@ def create_asteroid():
 
 # 게임 오버 화면 출력 함수
 def game_over():
+    global is_game_over
     font = pygame.font.Font(None, 74)
     text = font.render("Game Over", True, (255, 0, 0))
     screen.blit(text, (screen_width/2 - text.get_width()/2, screen_height/2 - text.get_height()/2))
-    pygame.display.update()
-    pygame.time.delay(2000)
-    pygame.quit()
-
-# 게임 루프
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                missile_x_pos = fighter_x_pos + (fighter_width / 2) - (missile_width / 2)
-                missile_y_pos = fighter_y_pos
-                missiles.append([missile_x_pos, missile_y_pos])
-                missile_sound.play()
+    restart_button = draw_button('Restart', screen_width / 2, screen_height / 2 - 50)
+    quit_button = draw_button('Quit', screen_width / 2, screen_height / 2 + 50)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if restart_button.collidepoint(event.pos):
+                    is_game_over = False
+                    return  # 게임 재시작
+                    
+                elif quit_button.collidepoint(event.pos):
+                    pygame.quit()  # 게임 종료
+        pygame.display.update()
     
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT] and fighter_x_pos > 0:
-        fighter_x_pos -= 5
-    if keys[pygame.K_RIGHT] and fighter_x_pos < screen_width - fighter_width:
-        fighter_x_pos += 5
 
-    # 미사일 위치 업데이트
-    missiles = [[m[0], m[1] - 10] for m in missiles if m[1] > 0]
+#버튼생성
+def draw_button(button_text, center_x, center_y, action=None):
+    font = pygame.font.Font(None, 36)
+    text = font.render(button_text, True, (255, 255, 255))
+    text_rect = text.get_rect(center=(center_x, center_y))
+    button_rect = text_rect.inflate(20, 10)
+    pygame.draw.rect(screen, (0, 128, 255), button_rect)
+    screen.blit(text, text_rect)
+    return button_rect
 
-    # 운석 생성
-    if random.randint(1, 100) < 5:
-        asteroids.append(create_asteroid())
+# 게임 시작 화면 
+def start_screen():
+    start_button = draw_button("Game Start", screen_width / 2, screen_height / 2 - 50)
+    quit_button = draw_button("Quit", screen_width / 2, screen_height / 2 + 50)
+    pygame.display.update()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if start_button.collidepoint(event.pos): #게임시작버튼
+                    return
+                elif quit_button.collidepoint(event.pos): #게임종료버튼
+                    pygame.quit()
 
-    # 운석 위치 업데이트
-    asteroids = [[a[0], a[1], a[2] + a[3], a[3]] for a in asteroids if a[2] < screen_height]
+                    
+def game_play():
+    global missiles, asteroids, explosions, fighter_x_pos, fighter_y_pos, is_game_over
+    #우주선 운석 위치 조정및 재조정
+    fighter_x_pos = (screen_width / 2) - (fighter_width / 2)
+    fighter_y_pos = screen_height - fighter_height - 10
+    asteroids = []
+    missiles = []
+    explosions = []
 
-    # 충돌 처리
-    for missile in missiles:
+    #게임 실행
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    missile_x_pos = fighter_x_pos + (fighter_width / 2) - (missile_width / 2)
+                    missile_y_pos = fighter_y_pos
+                    missiles.append([missile_x_pos, missile_y_pos])
+                    missile_sound.play()
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] and fighter_x_pos > 0:
+            fighter_x_pos -= 5
+        if keys[pygame.K_RIGHT] and fighter_x_pos < screen_width - fighter_width:
+            fighter_x_pos += 5
+
+        # 미사일 위치 업데이트
+        missiles = [[m[0], m[1] - 10] for m in missiles if m[1] > 0]
+
+        # 운석 생성
+        if random.randint(1, 100) < 5:
+            asteroids.append(create_asteroid())
+
+        # 운석 위치 업데이트
+        asteroids = [[a[0], a[1], a[2] + a[3], a[3]] for a in asteroids if a[2] < screen_height]
+
+        # 충돌 처리
+        for missile in missiles:
+            for asteroid in asteroids:
+                if (missile[0] > asteroid[1] and missile[0] < asteroid[1] + asteroid[0].get_rect().width) and \
+                   (missile[1] > asteroid[2] and missile[1] < asteroid[2] + asteroid[0].get_rect().height):
+                    missiles.remove(missile)
+                    asteroids.remove(asteroid)
+                    explosions.append([explosion_image, asteroid[1], asteroid[2], pygame.time.get_ticks()])
+                    break
+
+        # 전투기와 운석 충돌 처리
         for asteroid in asteroids:
-            if (missile[0] > asteroid[1] and missile[0] < asteroid[1] + asteroid[0].get_rect().width) and \
-               (missile[1] > asteroid[2] and missile[1] < asteroid[2] + asteroid[0].get_rect().height):
-                missiles.remove(missile)
-                asteroids.remove(asteroid)
-                explosions.append([explosion_image, asteroid[1], asteroid[2], pygame.time.get_ticks()])
-                break
+            if ((fighter_x_pos + fighter_width / 3) < asteroid[1] + asteroid[0].get_rect().width / 3 < (fighter_x_pos + fighter_width - fighter_width / 3) or
+                (fighter_x_pos + fighter_width / 3) < asteroid[1] + asteroid[0].get_rect().width - asteroid[0].get_rect().width / 3 < (fighter_x_pos + fighter_width - fighter_width / 3)) and \
+               ((fighter_y_pos + fighter_height / 3) < asteroid[2] + asteroid[0].get_rect().height / 3 < (fighter_y_pos + fighter_height - fighter_height / 3) or
+                (fighter_y_pos + fighter_height / 3) < asteroid[2] + asteroid[0].get_rect().height - asteroid[0].get_rect().height / 3 < (fighter_y_pos + fighter_height - fighter_height / 3)):
+                is_game_over = True
+                return
 
-    # 전투기와 운석 충돌 처리
-    for asteroid in asteroids:
-        if ((fighter_x_pos + fighter_width / 3) < asteroid[1] + asteroid[0].get_rect().width / 3 < (fighter_x_pos + fighter_width - fighter_width / 3) or
-            (fighter_x_pos + fighter_width / 3) < asteroid[1] + asteroid[0].get_rect().width - asteroid[0].get_rect().width / 3 < (fighter_x_pos + fighter_width - fighter_width / 3)) and \
-           ((fighter_y_pos + fighter_height / 3) < asteroid[2] + asteroid[0].get_rect().height / 3 < (fighter_y_pos + fighter_height - fighter_height / 3) or
-            (fighter_y_pos + fighter_height / 3) < asteroid[2] + asteroid[0].get_rect().height - asteroid[0].get_rect().height / 3< (fighter_y_pos + fighter_height - fighter_height / 3)):
-            game_over()
-            running = False
+        # 화면 그리기
+        screen.blit(background, (0, 0))
+        screen.blit(fighter, (fighter_x_pos, fighter_y_pos))
 
-    # 화면 그리기
-    screen.blit(background, (0, 0))
-    screen.blit(fighter, (fighter_x_pos, fighter_y_pos))
+        for missile in missiles:
+            screen.blit(missile_image, (missile[0], missile[1]))
 
-    for missile in missiles:
-        screen.blit(missile_image, (missile[0], missile[1]))
-    
-    for asteroid in asteroids:
-        screen.blit(asteroid[0], (asteroid[1], asteroid[2]))
+        for asteroid in asteroids:
+            screen.blit(asteroid[0], (asteroid[1], asteroid[2]))
 
-    # 폭발 효과 그리기
-    current_time = pygame.time.get_ticks()
-    explosions = [explosion for explosion in explosions if current_time - explosion[3] < 500]
-    for explosion in explosions:
-        screen.blit(explosion[0], (explosion[1], explosion[2]))
+        # 폭발 효과 그리기
+        current_time = pygame.time.get_ticks()  
+        explosions = [explosion for explosion in explosions if current_time - explosion[3] < 500]
+        for explosion in explosions:
+            screen.blit(explosion[0], (explosion[1], explosion[2]))
 
-    pygame.display.update()
-    clock.tick(60)
+        pygame.display.update()
+        clock.tick(60)
 
-pygame.quit()
+# 게임시작 화면 호출
+start_screen()
+
+#게임플레이중/ False값이 True값이 되면 게임오버화면 호출
+while True:
+    if is_game_over == False:
+        game_play()
+    elif is_game_over == True:
+        game_over()
