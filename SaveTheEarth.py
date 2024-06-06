@@ -91,10 +91,8 @@ def game_over():
                     return  # 게임 재시작
                 elif quit_button.collidepoint(event.pos):
                     pygame.quit()  # 게임 종료
-                    exit()
             elif event.type == pygame.QUIT:
                 pygame.quit()
-                exit()
         pygame.display.update()
 
 # 버튼 생성 함수
@@ -119,10 +117,8 @@ def start_screen():
                     return
                 elif quit_button.collidepoint(event.pos):  # 게임 종료 버튼
                     pygame.quit()
-                    exit()
             elif event.type == pygame.QUIT:
                 pygame.quit()
-                exit()
 
 # 게임 플레이 함수
 def game_play():
