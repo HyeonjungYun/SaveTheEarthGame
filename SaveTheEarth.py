@@ -54,14 +54,22 @@ asteroids = []
 # 운석 폭발 시간 관리
 explosions = []
 
+# 초기 목숨 설정
+lives = 5
+
+# 목숨 이미지 로드
+heart_image = pygame.image.load('heart.png')
+heart_size = heart_image.get_rect().size
+heart_width = heart_size[0]
+heart_height = heart_size[1]
+
 # 운석 생성 함수
 def create_asteroid():
     asteroid_img = pygame.image.load(random.choice(asteroid_images))
     asteroid_x_pos = random.randint(0, screen_width - asteroid_img.get_rect().width)
     asteroid_y_pos = 0 - asteroid_img.get_rect().width
     asteroid_speed = random.randint(5, 15)
-    asteroid_hp = 3  # 운석의 체력을 3으로 설정
-    return [asteroid_img, asteroid_x_pos, asteroid_y_pos, asteroid_speed, asteroid_hp]
+    return [asteroid_img, asteroid_x_pos, asteroid_y_pos, asteroid_speed]
 
 # 게임 오버 화면 출력 함수
 def game_over():
@@ -100,7 +108,7 @@ while running:
         asteroids.append(create_asteroid())
 
     # 운석 위치 업데이트
-    asteroids = [[a[0], a[1], a[2] + a[3], a[3], a[4]] for a in asteroids if a[2] < screen_height]
+    asteroids = [[a[0], a[1], a[2] + a[3], a[3]] for a in asteroids if a[2] < screen_height]
 
     # 충돌 처리
     for missile in missiles:
@@ -108,10 +116,8 @@ while running:
             if (missile[0] > asteroid[1] and missile[0] < asteroid[1] + asteroid[0].get_rect().width) and \
                (missile[1] > asteroid[2] and missile[1] < asteroid[2] + asteroid[0].get_rect().height):
                 missiles.remove(missile)
-                asteroid[4] -= 1  # 운석의 체력 감소
-                if asteroid[4] <= 0:
-                    asteroids.remove(asteroid)
-                    explosions.append([explosion_image, asteroid[1], asteroid[2], pygame.time.get_ticks()])
+                asteroids.remove(asteroid)
+                explosions.append([explosion_image, asteroid[1], asteroid[2], pygame.time.get_ticks()])
                 break
 
     # 전투기와 운석 충돌 처리
@@ -120,8 +126,11 @@ while running:
             (fighter_x_pos + fighter_width / 3) < asteroid[1] + asteroid[0].get_rect().width - asteroid[0].get_rect().width / 3 < (fighter_x_pos + fighter_width - fighter_width / 3)) and \
            ((fighter_y_pos + fighter_height / 3) < asteroid[2] + asteroid[0].get_rect().height / 3 < (fighter_y_pos + fighter_height - fighter_height / 3) or
             (fighter_y_pos + fighter_height / 3) < asteroid[2] + asteroid[0].get_rect().height - asteroid[0].get_rect().height / 3< (fighter_y_pos + fighter_height - fighter_height / 3)):
-            game_over()
-            running = False
+            lives -= 1
+            asteroids.remove(asteroid)
+            if lives == 0:
+                game_over()
+                running = False
 
     # 화면 그리기
     screen.blit(background, (0, 0))
@@ -139,6 +148,9 @@ while running:
     for explosion in explosions:
         screen.blit(explosion[0], (explosion[1], explosion[2]))
 
+    for i in range(lives):
+        screen.blit(heart_image, (10 + i*(heart_width + 10), 10))
+        
     pygame.display.update()
     clock.tick(60)
 
