@@ -16,10 +16,10 @@ pygame.display.set_caption("PyShooting: 지구를 지켜라")
 clock = pygame.time.Clock()
 
 # 배경 이미지
-background = pygame.image.load('background.png')
+background = pygame.image.load('img/background.png')
 
 # 전투기 이미지
-fighter = pygame.image.load('fighter.png')
+fighter = pygame.image.load('img/fighter.png')
 fighter_size = fighter.get_rect().size
 fighter_width = fighter_size[0]
 fighter_height = fighter_size[1]
@@ -27,23 +27,23 @@ fighter_x_pos = (screen_width / 2) - (fighter_width / 2)
 fighter_y_pos = screen_height - fighter_height - 10
 
 # 폭발 이미지
-explosion_image = pygame.image.load('explosion.png')
+explosion_image = pygame.image.load('img/explosion.png')
 
 # 미사일 이미지
-missile_image = pygame.image.load('missile.png')
+missile_image = pygame.image.load('img/missile.png')
 missile_size = missile_image.get_rect().size
 missile_width = missile_size[0]
 
 # 운석 이미지 파일 목록
-asteroid_images = ['rock1.png', 'rock2.png', 'rock3.png', 'rock4.png',
-                   'rock5.png', 'rock6.png', 'rock7.png', 'rock8.png']
+asteroid_images = ['img/rock1.png', 'img/rock2.png', 'img/rock3.png', 'img/rock4.png',
+                   'img/rock5.png', 'img/rock6.png', 'img/rock7.png', 'img/rock8.png']
 
 # 배경 음악
-pygame.mixer.music.load('background.mp3')
+pygame.mixer.music.load('audio/background.mp3')
 pygame.mixer.music.play(-1)
 
 # 미사일 발사 사운드
-missile_sound = pygame.mixer.Sound('missile.wav')
+missile_sound = pygame.mixer.Sound('audio/missile.wav')
 
 # 미사일 리스트
 missiles = []
@@ -58,7 +58,7 @@ explosions = []
 lives = 5
 
 # 목숨 이미지 로드
-heart_image = pygame.image.load('heart.png')
+heart_image = pygame.image.load('img/heart.png')
 heart_size = heart_image.get_rect().size
 heart_width = heart_size[0]
 heart_height = heart_size[1]
