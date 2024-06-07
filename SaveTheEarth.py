@@ -73,7 +73,7 @@ def create_asteroid():
     asteroid_img = pygame.image.load(random.choice(asteroid_images))
     asteroid_x_pos = random.randint(0, screen_width - asteroid_img.get_rect().width)
     asteroid_y_pos = 0 - asteroid_img.get_rect().width
-    asteroid_speed = random.randint(5, 15)
+    asteroid_speed = random.randint(1, 3)
     asteroid_hp = 3  # 운석의 체력을 3으로 설정
     return [asteroid_img, asteroid_x_pos, asteroid_y_pos, asteroid_speed, asteroid_hp]
 
@@ -149,6 +149,16 @@ def get_score(speed_bonus):
     basic_score = 10
     total_score += basic_score * speed_bonus
 
+#체력 바
+def draw_HPbar(x, y, hp):
+    if hp == 3:
+        color = (0, 255, 0)
+    elif hp == 2:
+        color = (255, 255, 0)
+    elif hp == 1:
+        color = (255, 0, 0)
+    pygame.draw.rect(screen, color, (x, y-10, 25*hp, 5))
+
 
 # 게임 플레이 함수
 def game_play():
@@ -183,7 +193,7 @@ def game_play():
         missiles = [[m[0], m[1] - 10] for m in missiles if m[1] > 0]
 
         # 운석 생성
-        if random.randint(1, 100) < 5:
+        if random.randint(1, 100) < 3:
             asteroids.append(create_asteroid())
 
         # 운석 위치 업데이트
@@ -223,6 +233,7 @@ def game_play():
 
         for asteroid in asteroids:
             screen.blit(asteroid[0], (asteroid[1], asteroid[2]))
+            draw_HPbar(asteroid[1], asteroid[2], asteroid[4])
 
         #인게임점수
         show_score()
