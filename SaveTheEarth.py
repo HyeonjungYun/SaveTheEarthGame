@@ -48,6 +48,7 @@ current_missile_index = 0
 missile_image = missile_images[current_missile_index]
 missile_size = missile_image.get_rect().size
 missile_width = missile_size[0]
+missile_height = missile_size[1]
 current_missile_power = 1 # 초기 미사일 파워 설정
 
 # 운석 이미지 파일 목록
@@ -200,7 +201,7 @@ def create_item(x, y):
 
 # 게임 플레이 함수
 def game_play():
-    global missiles, asteroids, explosions, items, fighter_x_pos, fighter_y_pos, is_game_over, lives, total_score, speed_bonus, fighter_speed, current_missile_index, missile_image, missile_width, current_missile_power
+    global missiles, asteroids, explosions, items, fighter_x_pos, fighter_y_pos, is_game_over, lives, total_score, speed_bonus, fighter_speed, current_missile_index, missile_image, missile_width, missile_height, current_missile_power
     # 우주선 운석 위치 조정 및 재조정
     fighter_x_pos = (screen_width / 2) - (fighter_width / 2)
     fighter_y_pos = screen_height - fighter_height - 10
@@ -242,8 +243,9 @@ def game_play():
         # 충돌 처리
         for missile in missiles:
             for asteroid in asteroids:
-                if (missile[0] > asteroid[1] and missile[0] < asteroid[1] + asteroid[0].get_rect().width) and \
-                   (missile[1] > asteroid[2] and missile[1] < asteroid[2] + asteroid[0].get_rect().height):
+                missile_rect = pygame.Rect(missile[0], missile[1], missile_width, missile_height)
+                asteroid_rect = pygame.Rect(asteroid[1], asteroid[2], asteroid[0].get_rect().width, asteroid[0].get_rect().height)
+                if missile_rect.colliderect(asteroid_rect):
                     missiles.remove(missile)
                     asteroid[4] -= current_missile_power # current_missile_power만큼 운석의 체력 감소
                     if asteroid[4] <= 0:
