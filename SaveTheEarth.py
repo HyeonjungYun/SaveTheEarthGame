@@ -1,5 +1,6 @@
 import pygame
 import random
+import sys
 
 # 게임 초기화
 pygame.init()
@@ -104,8 +105,10 @@ def game_over():
                 
                 elif quit_button.collidepoint(event.pos):
                     pygame.quit()  # 게임 종료
+                    sys.exit()
             elif event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit()
         pygame.display.update()
 
 # 버튼 생성 함수
@@ -134,8 +137,10 @@ def start_screen():
                     return
                 elif quit_button.collidepoint(event.pos):  # 게임 종료 버튼
                     pygame.quit()
+                    sys.exit()
             elif event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit()
 
 #인게임 점수판
 def show_score():
@@ -176,6 +181,7 @@ def game_play():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     missile_x_pos = fighter_x_pos + (fighter_width / 2) - (missile_width / 2)
