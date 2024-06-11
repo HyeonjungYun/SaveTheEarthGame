@@ -1,7 +1,6 @@
 import pygame
 import random
 import sys
-import time
 
 # 게임 초기화
 pygame.init()
@@ -118,7 +117,7 @@ def create_asteroid():
 
 # 게임 오버 화면 출력 함수
 def game_over():
-    global is_game_over, total_score, astoreid_speed_min, astoreid_speed_max
+    global is_game_over, total_score, astoreid_speed_min, astoreid_speed_max, font_s, current_missile_power, missile_width, fighter_speed, asteroid_frequency
     screen.fill((0, 0, 0))
     font = pygame.font.Font(None, 74)
     text = font.render("Game Over", True, (255, 0, 0))
@@ -147,6 +146,10 @@ def game_over():
                     missile_image = missile_images[current_missile_index]
                     missile_size = missile_image.get_rect().size
                     missile_width = missile_size[0]
+                    fighter_speed = 5
+                    astoreid_speed_min = 1
+                    astoreid_speed_max = 3
+                    asteroid_frequency = 3
                     return  # 게임 재시작
                 
                 elif quit_button.collidepoint(event.pos):
@@ -276,7 +279,7 @@ def game_play():
             if (astoreid_speed_min <= 20):
                 astoreid_speed_min += 3
                 astoreid_speed_max += 3
-            if asteroid_frequency <= 60:
+            if asteroid_frequency <= 30:
                 asteroid_frequency += 3
             present_score = total_score % 500
 
@@ -290,16 +293,6 @@ def game_play():
                     missile_y_pos = fighter_y_pos
                     missiles.append([missile_x_pos, missile_y_pos])
                     missile_sound.play()
-
-        #특정점수 도달시 스테이지 이동
-        if total_score >= 100:
-            current_stage += 1
-            stage_clear_screen(current_stage - 1)
-                # 다음 스테이지 시작 시 오브젝트 초기화
-            asteroids = []
-            missiles = []
-            items = []
-            explosions = []
                 
         # fighter_speed만큼 이동
         keys = pygame.key.get_pressed()
