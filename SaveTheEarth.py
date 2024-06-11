@@ -71,6 +71,10 @@ asteroids = []
 # 운석 폭발 시간 관리
 explosions = []
 
+# 충돌 시 필요 변수 설정
+flash_duration = 200  # 플래시 지속 시간 (밀리초)
+flash_start_time = None
+
 # 아이템 이미지 파일 경로
 power_item_image = pygame.image.load('img/power_item.png')
 speed_item_image = pygame.image.load('img/speed_item.png')
@@ -251,11 +255,11 @@ def stage_clear_screen(stage):
     pygame.time.wait(2000)
     
 
-# 게임 플레이 함수
 def game_play():
     global missiles, asteroids, explosions, items, fighter_x_pos, fighter_y_pos, is_game_over, lives, total_score, speed_bonus, \
         fighter_speed, current_missile_index, missile_image, missile_width, missile_height, current_missile_power, \
-            astoreid_speed_min, astoreid_speed_max, present_score, asteroid_frequency, asteroid_frequency_min, asteroid_frequency_max, current_missile_power, current_stage
+        astoreid_speed_min, astoreid_speed_max, present_score, asteroid_frequency, asteroid_frequency_min, asteroid_frequency_max, \
+        current_missile_power, current_stage, flash_start_time, flash_duration
     
     # 우주선 운석 위치 조정 및 재조정
     fighter_x_pos = (screen_width / 2) - (fighter_width / 2)
@@ -266,6 +270,7 @@ def game_play():
     items = []
     lives = 5
     stage_start_time = pygame.time.get_ticks()
+    flash_start_time = None  # 플래시 효과 초기화
 
     # 게임 실행
     while not is_game_over:
@@ -344,6 +349,7 @@ def game_play():
             if fighter_rect.colliderect(asteroid_rect):
                 lives -= 1
                 asteroids.remove(asteroid)
+                flash_start_time = pygame.time.get_ticks()  # 플래시 효과 시작 시간 설정
                 if lives == 0:
                     is_game_over = True
 
@@ -389,10 +395,10 @@ def game_play():
         
         # 현재 공격력과 속도 표시
         show_stats()
-
-        #현재 스테이지 및 다음 스테이지까지 남은 시간 표시
+        
+        # 현재 스테이지 및 다음 스테이지까지 남은 시간 표시
         show_stage()
-
+        
         # 폭발 효과 그리기
         current_time = pygame.time.get_ticks()
         explosions = [explosion for explosion in explosions if current_time - explosion[3] < 500]
@@ -402,6 +408,15 @@ def game_play():
         # 목숨 표시
         for i in range(lives):
             screen.blit(heart_image, (10 + i * (heart_width + 10), 10))
+        
+        # 충돌 시각적 효과
+        if flash_start_time and current_time - flash_start_time < flash_duration:
+            flash_alpha = 128 * (1 - (current_time - flash_start_time) / flash_duration)  # 반투명 효과로 변경 (기존 255에서 128로 변경)
+            flash_surface = pygame.Surface((screen_width, screen_height))
+            flash_surface.set_alpha(flash_alpha)
+            flash_surface.fill((255, 0, 0))  # 붉은 색으로 플래시 효과
+            screen.blit(flash_surface, (0, 0))
+        
         pygame.display.update()
         clock.tick(60)
         
