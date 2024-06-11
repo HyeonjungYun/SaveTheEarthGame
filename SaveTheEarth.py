@@ -272,16 +272,13 @@ def game_play():
     explosions = []
     items = []
     lives = 5
+    next_stage_score = 500
     stage_start_time = pygame.time.get_ticks()
     flash_start_time = None  # 플래시 효과 초기화
 
     # 게임 실행
     while not is_game_over:
         if (present_score >= 500):
-            if (current_stage == 1 and total_score >= 5000) :
-                current_stage += 1
-            if (current_stage == 2 and total_score >= 20000) :
-                current_stage += 1
             if (astoreid_speed_min <= 20):
                 astoreid_speed_min += 3
                 astoreid_speed_max += 3
@@ -299,6 +296,16 @@ def game_play():
                     missile_y_pos = fighter_y_pos
                     missiles.append([missile_x_pos, missile_y_pos])
                     missile_sound.play()
+        #특정점수 도달시 스테이지 이동
+        if total_score >= next_stage_score:
+            current_stage += 1
+            stage_clear_screen(current_stage - 1)
+                # 다음 스테이지 시작 시 오브젝트 초기화
+            asteroids = []
+            missiles = []
+            items = []
+            explosions = []
+            next_stage_score *= 2
                 
         # fighter_speed만큼 이동
         keys = pygame.key.get_pressed()
