@@ -93,18 +93,28 @@ heart_height = heart_size[1]
 total_score = 0
 speed_bonus = 0
 
+# 운석 생성 시 사용되는 int값
+astoreid_speed_min = 1
+astoreid_speed_max = 3
+asteroid_frequency = 3
+asteroid_frequency_min = 1
+asteroid_frequency_max = 100
+
+# 난이도 상승 기준을 측정하는 변수
+present_score = 0
+
 # 운석 생성 함수
 def create_asteroid():
     asteroid_img = pygame.image.load(random.choice(asteroid_images))
     asteroid_x_pos = random.randint(0, screen_width - asteroid_img.get_rect().width)
     asteroid_y_pos = 0 - asteroid_img.get_rect().width
-    asteroid_speed = random.randint(1, 3)
+    asteroid_speed = random.randint(astoreid_speed_min, astoreid_speed_max)
     asteroid_hp = 3  # 운석의 체력을 3으로 설정
     return [asteroid_img, asteroid_x_pos, asteroid_y_pos, asteroid_speed, asteroid_hp]
 
 # 게임 오버 화면 출력 함수
 def game_over():
-    global is_game_over, total_score
+    global is_game_over, total_score, astoreid_speed_min, astoreid_speed_max
     screen.fill((0, 0, 0))
     font = pygame.font.Font(None, 74)
     text = font.render("Game Over", True, (255, 0, 0))
@@ -127,6 +137,8 @@ def game_over():
                     total_score = 0
                     current_missile_index = 0
                     current_missile_power = 1
+                    astoreid_speed_min = 1
+                    astoreid_speed_max = 3
                     missile_image = missile_images[current_missile_index]
                     missile_size = missile_image.get_rect().size
                     missile_width = missile_size[0]
@@ -180,9 +192,11 @@ def show_score():
 
 # 점수 획득 - 낙하속도에 따라 점수량 다름
 def get_score(speed_bonus):
-    global total_score
+    global total_score, present_score
     basic_score = 10
     total_score += basic_score * speed_bonus
+    present_score += basic_score * speed_bonus
+    
 
 # 체력 바
 def draw_HPbar(x, y, hp):
@@ -206,7 +220,9 @@ def create_item(x, y):
 
 # 게임 플레이 함수
 def game_play():
-    global missiles, asteroids, explosions, items, fighter_x_pos, fighter_y_pos, is_game_over, lives, total_score, speed_bonus, fighter_speed, current_missile_index, missile_image, missile_width, missile_height, current_missile_power
+    global missiles, asteroids, explosions, items, fighter_x_pos, fighter_y_pos, is_game_over, lives, total_score, speed_bonus, \
+        fighter_speed, current_missile_index, missile_image, missile_width, missile_height, current_missile_power, \
+            astoreid_speed_min, astoreid_speed_max, present_score, asteroid_frequency, asteroid_frequency_min, asteroid_frequency_max
     # 우주선 운석 위치 조정 및 재조정
     fighter_x_pos = (screen_width / 2) - (fighter_width / 2)
     fighter_y_pos = screen_height - fighter_height - 10
@@ -218,6 +234,14 @@ def game_play():
 
     # 게임 실행
     while not is_game_over:
+        if (present_score >= 500):
+            if (astoreid_speed_min <= 20):
+                astoreid_speed_min += 3
+                astoreid_speed_max += 3
+            if asteroid_frequency <= 60:
+                asteroid_frequency += 3
+            present_score = total_score % 500
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -240,7 +264,7 @@ def game_play():
         missiles = [[m[0], m[1] - 10] for m in missiles if m[1] > 0]
 
         # 운석 생성
-        if random.randint(1, 100) < 3:
+        if random.randint(asteroid_frequency_min, asteroid_frequency_max) < asteroid_frequency:
             asteroids.append(create_asteroid())
 
         # 운석 위치 업데이트
