@@ -48,6 +48,7 @@ current_missile_index = 0
 missile_image = missile_images[current_missile_index]
 missile_size = missile_image.get_rect().size
 missile_width = missile_size[0]
+missile_height = missile_size[1]
 current_missile_power = 1 # 초기 미사일 파워 설정
 
 # 운석 이미지 파일 목록
@@ -75,7 +76,8 @@ flash_duration = 200  # 플래시 지속 시간 (밀리초)
 flash_start_time = None
 
 # 아이템 이미지 파일 경로
-power_item_image = pygame.image.load('img/power_item.png')
+upgrade_item_image = pygame.image.load('img/upgrade_item.png') 
+pierce_item_image = pygame.image.load('img/pierce_item.png')
 speed_item_image = pygame.image.load('img/speed_item.png')
 life_item_image = pygame.image.load('img/heart.png')
 
@@ -150,6 +152,7 @@ def game_over():
                     missile_image = missile_images[current_missile_index]
                     missile_size = missile_image.get_rect().size
                     missile_width = missile_size[0]
+                    missile_height = missile_size[1]
                     fighter_speed = 5
                     astoreid_speed_min = 1
                     astoreid_speed_max = 3
@@ -225,9 +228,11 @@ def draw_HPbar(x, y, hp, max_hp):
 
 # 아이템 생성 함수
 def create_item(x, y):
-    item_type = random.choice(['power', 'speed', 'life'])
-    if item_type == 'power':
-        return [power_item_image, x, y, 'power']
+    item_type = random.choice(['upgrade', 'pierce', 'speed', 'life'])
+    if item_type == 'upgrade':
+        return [upgrade_item_image, x, y, 'upgrade']
+    elif item_type == 'pierce':
+        return [pierce_item_image, x, y, 'pierce']
     elif item_type == 'speed':
         return [speed_item_image, x, y, 'speed']
     elif item_type == 'life':
@@ -262,7 +267,7 @@ def game_play():
     global missiles, asteroids, explosions, items, fighter_x_pos, fighter_y_pos, is_game_over, lives, total_score, speed_bonus, \
         fighter_speed, current_missile_index, missile_image, missile_width, missile_height, current_missile_power, \
         astoreid_speed_min, astoreid_speed_max, present_score, asteroid_frequency, asteroid_frequency_min, asteroid_frequency_max, \
-        current_missile_power, current_stage, flash_start_time, flash_duration
+        current_missile_power, current_stage, flash_start_time, flash_duration, pierce_count
     
     # 우주선 운석 위치 조정 및 재조정
     fighter_x_pos = (screen_width / 2) - (fighter_width / 2)
@@ -274,6 +279,7 @@ def game_play():
     lives = 5
     stage_start_time = pygame.time.get_ticks()
     flash_start_time = None  # 플래시 효과 초기화
+    pierce_count = 1  # 관통력 초기화
 
     # 게임 실행
     while not is_game_over:
@@ -297,7 +303,7 @@ def game_play():
                 if event.key == pygame.K_SPACE:
                     missile_x_pos = fighter_x_pos + (fighter_width / 2) - (missile_width / 2)
                     missile_y_pos = fighter_y_pos
-                    missiles.append([missile_x_pos, missile_y_pos])
+                    missiles.append([missile_x_pos, missile_y_pos, pierce_count])
                     missile_sound.play()
                 
         # fighter_speed만큼 이동
@@ -308,7 +314,7 @@ def game_play():
             fighter_x_pos += fighter_speed
 
         # 미사일 위치 업데이트
-        missiles = [[m[0], m[1] - 10] for m in missiles if m[1] > 0]
+        missiles = [[m[0], m[1] - 10, m[2]] for m in missiles if m[1] > 0]
 
         # 운석 생성
         if random.randint(asteroid_frequency_min, asteroid_frequency_max) < asteroid_frequency:
@@ -320,9 +326,9 @@ def game_play():
         # 충돌 처리
         for missile in missiles:
             for asteroid in asteroids:
-                if (missile[0] > asteroid[1] and missile[0] < asteroid[1] + asteroid[0].get_rect().width) and \
-                   (missile[1] > asteroid[2] and missile[1] < asteroid[2] + asteroid[0].get_rect().height):
-                    missiles.remove(missile)
+                missile_rect = pygame.Rect(missile[0], missile[1], missile_width, missile_height)
+                asteroid_rect = pygame.Rect(asteroid[1], asteroid[2], asteroid[0].get_rect().width, asteroid[0].get_rect().height)
+                if missile_rect.colliderect(asteroid_rect):
                     asteroid[4] -= current_missile_power  # current_missile_power만큼 운석의 체력 감소
                     if asteroid[4] <= 0:
                         asteroids.remove(asteroid)
@@ -330,6 +336,9 @@ def game_play():
                         get_score(asteroid[3])
                         if random.random() < 0.15:  # 15% 확률로 아이템 생성
                             items.append(create_item(asteroid[1], asteroid[2]))
+                    missile[2] -= 1  # 미사일의 남은 관통 횟수 감소
+                    if missile[2] < 0:
+                        missiles.remove(missile)
                     break
 
         # 전투기와 운석 충돌 처리
@@ -351,13 +360,15 @@ def game_play():
             fighter_rect = pygame.Rect(fighter_x_pos, fighter_y_pos, fighter_width, fighter_height)
             item_rect = pygame.Rect(item[1], item[2], item[0].get_rect().width, item[0].get_rect().height)
             if fighter_rect.colliderect(item_rect):
-                if item[3] == 'power':
+                if item[3] == 'upgrade':
                     current_missile_power += 1
                     missile_index = min(current_missile_power // 10, len(missile_images) - 1)
                     missile_image = missile_images[missile_index]
                     missile_size = missile_image.get_rect().size
                     missile_width = missile_size[0]
                     missile_height = missile_size[1]
+                elif item[3] == 'pierce':
+                    pierce_count += 1  # 관통 횟수 증가
                 elif item[3] == 'speed':
                     fighter_speed += 1
                 elif item[3] == 'life':
