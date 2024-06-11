@@ -207,6 +207,14 @@ def create_item(x, y):
     elif item_type == 'life':
         return [life_item_image, x, y, 'life']
 
+# 현재 공격력과 속도 표시
+def show_stats():
+    font = pygame.font.Font(None, 36)
+    attack_power_text = font.render(f"Power: {current_missile_power}", True, (255, 255, 255))
+    speed_text = font.render(f"Speed: {fighter_speed}", True, (255, 255, 255))
+    screen.blit(attack_power_text, (screen_width - attack_power_text.get_width() - 20, 20))
+    screen.blit(speed_text, (screen_width - speed_text.get_width() - 20, 60))
+
 # 게임 플레이 함수
 def game_play():
     global missiles, asteroids, explosions, items, fighter_x_pos, fighter_y_pos, is_game_over, lives, total_score, speed_bonus, fighter_speed, current_missile_index, missile_image, missile_width, missile_height, current_missile_power
@@ -301,30 +309,33 @@ def game_play():
         # 화면 그리기
         screen.blit(background, (0, 0))
         screen.blit(fighter, (fighter_x_pos, fighter_y_pos))
-
+        
         for missile in missiles:
             screen.blit(missile_image, (missile[0], missile[1]))
-
+        
         for asteroid in asteroids:
             screen.blit(asteroid[0], (asteroid[1], asteroid[2]))
             draw_HPbar(asteroid[1], asteroid[2], asteroid[4], asteroid[5])
-
+        
         for item in items:
             screen.blit(item[0], (item[1], item[2]))
-
+        
         # 인게임 점수
         show_score()
-
+        
+        # 현재 공격력과 속도 표시
+        show_stats()
+        
         # 폭발 효과 그리기
         current_time = pygame.time.get_ticks()
         explosions = [explosion for explosion in explosions if current_time - explosion[3] < 500]
         for explosion in explosions:
             screen.blit(explosion[0], (explosion[1], explosion[2]))
-
+        
         # 목숨 표시
         for i in range(lives):
             screen.blit(heart_image, (10 + i * (heart_width + 10), 10))
-
+        
         pygame.display.update()
         clock.tick(60)
 
