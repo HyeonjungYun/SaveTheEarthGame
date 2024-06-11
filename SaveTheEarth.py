@@ -298,15 +298,19 @@ boss_height = boss_size[1]
 def create_boss():
     boss_x_pos = (screen_width / 2) - (boss_width / 2)
     boss_y_pos = -boss_height
-    boss_speed = 1  # 천천히 내려오게 설정
-    boss_hp = 500  # 보스 몬스터 체력
+    boss_speed = 0.2  # 천천히 내려오게 설정
+    boss_hp = 50000  # 보스 몬스터 체력
     return [boss_image, boss_x_pos, boss_y_pos, boss_speed, boss_hp]
 
 # 보스 몬스터 체력 바
 def show_boss_hp(boss):
     x, y, hp = boss[1], boss[2], boss[4]
-    pygame.draw.rect(screen, (255, 0, 0), (x, y - 20, boss_width, 10))
-    pygame.draw.rect(screen, (0, 255, 0), (x, y - 20, boss_width * (hp / 200), 10))
+    max_hp = 50000  # 보스 몬스터 최대 체력
+    bar_x = 50  # 화면 위 체력 바의 x 위치
+    bar_y = 50  # 화면 위 체력 바의 y 위치
+    bar_length = screen_width - 100  # 체력 바의 길이
+    pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, bar_length, 20))  # 전체 체력 바
+    pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, bar_length * (hp / max_hp), 20))  # 현재 체력
 
 # 보스 몬스터와의 전투 처리 함수
 def boss_stage():
@@ -338,8 +342,7 @@ def boss_stage():
         missiles = [[m[0], m[1] - 10, m[2]] for m in missiles if m[1] > 0]
 
         # 보스 몬스터 위치 업데이트
-        if boss[2] < 100:
-            boss[2] += boss[3]
+        boss[2] += boss[3]
 
         # 보스 몬스터와 미사일 충돌 처리
         for missile in missiles:
@@ -373,6 +376,8 @@ def boss_stage():
             screen.blit(missile_image, (missile[0], missile[1]))
 
         screen.blit(boss[0], (boss[1], boss[2]))
+        
+        # 보스 체력 바 화면 위에 그리기
         show_boss_hp(boss)
 
         for explosion in explosions:
