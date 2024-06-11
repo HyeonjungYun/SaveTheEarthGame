@@ -299,7 +299,7 @@ def create_boss():
     boss_x_pos = (screen_width / 2) - (boss_width / 2)
     boss_y_pos = -boss_height
     boss_speed = 0.2  # 천천히 내려오게 설정
-    boss_hp = 50000  # 보스 몬스터 체력
+    boss_hp = 100000  # 보스 몬스터 체력
     return [boss_image, boss_x_pos, boss_y_pos, boss_speed, boss_hp]
 
 # 보스 몬스터 체력 바
@@ -549,6 +549,7 @@ def game_play():
         
         # 보스 등장 처리
         if total_score >= 30000:
+            explosions = []  
             if boss_stage():
                 is_game_clear = True
         
