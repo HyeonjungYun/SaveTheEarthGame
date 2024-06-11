@@ -1,6 +1,7 @@
 import pygame
 import random
 import sys
+import time
 
 # 게임 초기화
 pygame.init()
@@ -48,7 +49,6 @@ current_missile_index = 0
 missile_image = missile_images[current_missile_index]
 missile_size = missile_image.get_rect().size
 missile_width = missile_size[0]
-missile_height = missile_size[1]
 current_missile_power = 1 # 초기 미사일 파워 설정
 
 # 운석 이미지 파일 목록
@@ -92,6 +92,20 @@ heart_height = heart_size[1]
 total_score = 0
 speed_bonus = 0
 
+#현재 스테이지 및 시간
+current_stage = 1
+stage_start_time = pygame.time.get_ticks()
+
+# 운석 생성 시 사용되는 int값
+astoreid_speed_min = 1
+astoreid_speed_max = 3
+asteroid_frequency = 3
+asteroid_frequency_min = 1
+asteroid_frequency_max = 100
+
+# 난이도 상승 기준을 측정하는 변수
+present_score = 0
+
 # 운석 생성 함수
 def create_asteroid():
     asteroid_img = pygame.image.load(random.choice(asteroid_images))
@@ -104,7 +118,7 @@ def create_asteroid():
 
 # 게임 오버 화면 출력 함수
 def game_over():
-    global is_game_over, total_score
+    global is_game_over, total_score, astoreid_speed_min, astoreid_speed_max
     screen.fill((0, 0, 0))
     font = pygame.font.Font(None, 74)
     text = font.render("Game Over", True, (255, 0, 0))
@@ -120,6 +134,7 @@ def game_over():
     pygame.display.update()
     
     while True:
+
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if restart_button.collidepoint(event.pos):
@@ -127,6 +142,8 @@ def game_over():
                     total_score = 0
                     current_missile_index = 0
                     current_missile_power = 1
+                    astoreid_speed_min = 1
+                    astoreid_speed_max = 3
                     missile_image = missile_images[current_missile_index]
                     missile_size = missile_image.get_rect().size
                     missile_width = missile_size[0]
@@ -180,10 +197,12 @@ def show_score():
 
 # 점수 획득 - 낙하속도에 따라 점수량 다름
 def get_score(speed_bonus):
-    global total_score
+    global total_score, present_score
     basic_score = 10
     total_score += basic_score * speed_bonus
- 
+    present_score += basic_score * speed_bonus
+    
+
 # 체력 바
 def draw_HPbar(x, y, hp, max_hp):
     bar_length = 75  # 바의 최대 길이 설정
@@ -214,10 +233,30 @@ def show_stats():
     speed_text = font.render(f"Speed: {fighter_speed}", True, (255, 255, 255))
     screen.blit(attack_power_text, (screen_width - attack_power_text.get_width() - 20, 20))
     screen.blit(speed_text, (screen_width - speed_text.get_width() - 20, 60))
+    
+# 현재 스테이지 표시
+def show_stage():
+    global current_stage, stage_start_time
+    font = pygame.font.Font(None, 36)
+    stage_text = font.render("Stage: " + str(current_stage), True, (255, 255, 255))
+    screen.blit(stage_text, (10, 50))
+
+# 스테이지 클리어 화면
+def stage_clear_screen(stage):
+    screen.fill((0, 0, 0))
+    font = pygame.font.Font(None, 74)
+    text = font.render(f"Stage {stage} Clear!", True, (0, 255, 0))
+    screen.blit(text, (screen_width / 2 - text.get_width() / 2, screen_height / 2 - text.get_height() / 2))
+    pygame.display.update()
+    pygame.time.wait(2000)
+    
 
 # 게임 플레이 함수
 def game_play():
-    global missiles, asteroids, explosions, items, fighter_x_pos, fighter_y_pos, is_game_over, lives, total_score, speed_bonus, fighter_speed, current_missile_index, missile_image, missile_width, missile_height, current_missile_power
+    global missiles, asteroids, explosions, items, fighter_x_pos, fighter_y_pos, is_game_over, lives, total_score, speed_bonus, \
+        fighter_speed, current_missile_index, missile_image, missile_width, missile_height, current_missile_power, \
+            astoreid_speed_min, astoreid_speed_max, present_score, asteroid_frequency, asteroid_frequency_min, asteroid_frequency_max, current_missile_power, current_stage
+    
     # 우주선 운석 위치 조정 및 재조정
     fighter_x_pos = (screen_width / 2) - (fighter_width / 2)
     fighter_y_pos = screen_height - fighter_height - 10
@@ -226,9 +265,22 @@ def game_play():
     explosions = []
     items = []
     lives = 5
+    stage_start_time = pygame.time.get_ticks()
 
     # 게임 실행
     while not is_game_over:
+        if (present_score >= 500):
+            if (current_stage == 1 and total_score >= 5000) :
+                current_stage += 1
+            if (current_stage == 2 and total_score >= 20000) :
+                current_stage += 1
+            if (astoreid_speed_min <= 20):
+                astoreid_speed_min += 3
+                astoreid_speed_max += 3
+            if asteroid_frequency <= 60:
+                asteroid_frequency += 3
+            present_score = total_score % 500
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -239,7 +291,20 @@ def game_play():
                     missile_y_pos = fighter_y_pos
                     missiles.append([missile_x_pos, missile_y_pos])
                     missile_sound.play()
-
+        # 1분마다 스테이지 변경
+        current_time = pygame.time.get_ticks()
+        if total_score <= 100000:
+            if current_stage < 3:
+                current_stage += 1
+                stage_clear_screen(current_stage - 1)
+                stage_start_time = pygame.time.get_ticks()
+                
+                # 다음 스테이지 시작 시 오브젝트 초기화
+                asteroids = []
+                missiles = []
+                items = []
+                explosions = []
+                
         # fighter_speed만큼 이동
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and fighter_x_pos > 0:
@@ -251,7 +316,7 @@ def game_play():
         missiles = [[m[0], m[1] - 10] for m in missiles if m[1] > 0]
 
         # 운석 생성
-        if random.randint(1, 100) < 3:
+        if random.randint(asteroid_frequency_min, asteroid_frequency_max) < asteroid_frequency:
             asteroids.append(create_asteroid())
 
         # 운석 위치 업데이트
@@ -260,9 +325,8 @@ def game_play():
         # 충돌 처리
         for missile in missiles:
             for asteroid in asteroids:
-                missile_rect = pygame.Rect(missile[0], missile[1], missile_width, missile_height)
-                asteroid_rect = pygame.Rect(asteroid[1], asteroid[2], asteroid[0].get_rect().width, asteroid[0].get_rect().height)
-                if missile_rect.colliderect(asteroid_rect):
+                if (missile[0] > asteroid[1] and missile[0] < asteroid[1] + asteroid[0].get_rect().width) and \
+                   (missile[1] > asteroid[2] and missile[1] < asteroid[2] + asteroid[0].get_rect().height):
                     missiles.remove(missile)
                     asteroid[4] -= current_missile_power  # current_missile_power만큼 운석의 체력 감소
                     if asteroid[4] <= 0:
@@ -325,7 +389,10 @@ def game_play():
         
         # 현재 공격력과 속도 표시
         show_stats()
-        
+
+        #현재 스테이지 및 다음 스테이지까지 남은 시간 표시
+        show_stage()
+
         # 폭발 효과 그리기
         current_time = pygame.time.get_ticks()
         explosions = [explosion for explosion in explosions if current_time - explosion[3] < 500]
@@ -335,9 +402,9 @@ def game_play():
         # 목숨 표시
         for i in range(lives):
             screen.blit(heart_image, (10 + i * (heart_width + 10), 10))
-        
         pygame.display.update()
         clock.tick(60)
+        
 
 # 게임 시작 화면 호출
 start_screen()
