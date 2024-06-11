@@ -21,7 +21,7 @@
 3. 해당 issue의 번호에 맞게 branch를 생성한다.
   - 기능 추가시 feature-#?
   - 버그 픽스 시 fix-#?
-  - 코드 구조 변경 기 refactor-#?
+  - 코드 구조 변경 시 refactor-#?
   - 그 외 chore-#?
 3. 생성된 브랜치에서 작업을 완료 후 push
 4. master 브랜치로 Pull Request
