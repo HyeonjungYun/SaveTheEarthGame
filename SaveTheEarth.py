@@ -130,8 +130,7 @@ def create_asteroid():
 
 # 게임 오버 화면 출력 함수
 def game_over():
-    global is_game_over, total_score, astoreid_speed_min, astoreid_speed_max, font_s, item_generate, \
-        current_missile_power, missile_width, fighter_speed, asteroid_frequency, missile_height
+    global is_game_over, total_score, current_missile_index, current_missile_power, missile_image, missile_width, missile_height, fighter_speed, astoreid_speed_min, astoreid_speed_max, asteroid_frequency, item_generate
     screen.fill((0, 0, 0))
     font = pygame.font.Font(None, 74)
     text = font.render("Game Over", True, (255, 0, 0))
@@ -154,8 +153,6 @@ def game_over():
                     total_score = 0
                     current_missile_index = 0
                     current_missile_power = 1
-                    astoreid_speed_min = 1
-                    astoreid_speed_max = 3
                     missile_image = missile_images[current_missile_index]
                     missile_size = missile_image.get_rect().size
                     missile_width = missile_size[0]
@@ -174,6 +171,7 @@ def game_over():
                 pygame.quit()
                 sys.exit()
         pygame.display.update()
+
 
 # 게임 클리어 화면 출력 함수
 def game_clear():
@@ -607,7 +605,7 @@ def game_play():
             if fighter_rect.colliderect(item_rect):
                 if item[3] == 'upgrade' and current_missile_power < 30:
                     current_missile_power += 1
-                    missile_index = min(current_missile_power // 10, len(missile_images) - 1)
+                    missile_index = (current_missile_power - 1) // 5
                     missile_image = missile_images[missile_index]
                     missile_size = missile_image.get_rect().size
                     missile_width = missile_size[0]
