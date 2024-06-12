@@ -102,6 +102,9 @@ speed_bonus = 0
 current_stage = 1
 stage_start_time = pygame.time.get_ticks()
 
+# 스테이지 클리어 시 사용하는 변수
+stage_clear = False
+
 # 운석 생성 시 사용되는 int값
 astoreid_speed_min = 1
 astoreid_speed_max = 3
@@ -301,12 +304,42 @@ def show_stage():
 
 # 스테이지 클리어 화면
 def stage_clear_screen(stage):
-    screen.fill((0, 0, 0))
     font = pygame.font.Font(None, 74)
-    text = font.render(f"Stage {stage} Clear!", True, (0, 255, 0))
-    screen.blit(text, (screen_width / 2 - text.get_width() / 2, screen_height / 2 - text.get_height() / 2))
-    pygame.display.update()
-    pygame.time.wait(2000)
+    text = font.render(f"Stage {stage}", True, (0, 255, 0))
+    text_rect = text.get_rect(center=(screen_width / 2, screen_height / 2))
+    start_time = pygame.time.get_ticks()
+
+    while pygame.time.get_ticks() - start_time < 2000:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        screen.blit(background, (0, 0))
+        screen.blit(fighter, (fighter_x_pos, fighter_y_pos))
+
+        for item in items:
+            screen.blit(item[0], (item[1], item[2]))
+
+        # 인게임 점수
+        show_score()
+
+        # 현재 공격력과 속도 표시
+        show_stats()
+
+        # 현재 스테이지 표시
+        show_stage()
+
+        # 목숨 표시
+        for i in range(lives):
+            screen.blit(heart_image, (10 + i * (heart_width + 10), 10))
+
+        # "Stage ?" 표시
+        screen.blit(text, text_rect)
+
+        pygame.display.update()
+        clock.tick(60)
+
 
 # 보스 몬스터 이미지 로드
 boss_image = pygame.image.load('img/boss.png')
@@ -467,7 +500,7 @@ def game_play():
     global missiles, asteroids, explosions, items, fighter_x_pos, fighter_y_pos, is_game_over, is_game_clear, lives, total_score, speed_bonus, \
         fighter_speed, current_missile_index, missile_image, missile_width, missile_height, current_missile_power, \
         astoreid_speed_min, astoreid_speed_max, present_score, asteroid_frequency, asteroid_frequency_min, asteroid_frequency_max, \
-        current_missile_power, current_stage, flash_start_time, flash_duration, pierce_count, boss_rocks, item_generate
+        current_missile_power, current_stage, flash_start_time, flash_duration, pierce_count, boss_rocks, item_generate, stage_clear
 
     # 우주선 운석 위치 조정 및 재조정
     fighter_x_pos = (screen_width / 2) - (fighter_width / 2)
@@ -488,9 +521,15 @@ def game_play():
             if current_stage == 1 and total_score >= 5000:
                 current_stage += 1
                 item_generate = 0.1
+                asteroids = []  # 기존 운석 제거
+                stage_clear = True
+                stage_clear_start_time = pygame.time.get_ticks()
             if current_stage == 2 and total_score >= 20000:
                 current_stage += 1
                 item_generate = 0.03
+                asteroids = []  # 기존 운석 제거
+                stage_clear = True
+                stage_clear_start_time = pygame.time.get_ticks()
             if astoreid_speed_min <= 20:
                 astoreid_speed_min += 3
                 astoreid_speed_max += 3
@@ -519,12 +558,13 @@ def game_play():
         # 미사일 위치 업데이트
         missiles = [[m[0], m[1] - 10, m[2]] for m in missiles if m[1] > 0]
 
-        # 운석 생성
-        if random.randint(asteroid_frequency_min, asteroid_frequency_max) < asteroid_frequency:
-            asteroids.append(create_asteroid())
+        if not stage_clear:  # 스테이지 클리어 상태가 아닌 경우에만 운석 생성
+            # 운석 생성
+            if random.randint(asteroid_frequency_min, asteroid_frequency_max) < asteroid_frequency:
+                asteroids.append(create_asteroid())
 
-        # 운석 위치 업데이트
-        asteroids = [[a[0], a[1], a[2] + a[3], a[3], a[4], a[5]] for a in asteroids if a[2] < screen_height]
+            # 운석 위치 업데이트
+            asteroids = [[a[0], a[1], a[2] + a[3], a[3], a[4], a[5]] for a in asteroids if a[2] < screen_height]
 
         # 충돌 처리
         for missile in missiles:
@@ -624,6 +664,15 @@ def game_play():
             flash_surface.fill((255, 0, 0))  # 붉은 색으로 플래시 효과
             screen.blit(flash_surface, (0, 0))
         
+        # 스테이지 클리어 메시지 표시
+        if stage_clear:
+            font = pygame.font.Font(None, 74)
+            text = font.render(f"Stage {current_stage}", True, (0, 255, 0))
+            text_rect = text.get_rect(center=(screen_width / 2, screen_height / 2))
+            screen.blit(text, text_rect)
+            if current_time - stage_clear_start_time > 2000:  # 2초가 지나면 스테이지 클리어 상태 해제
+                stage_clear = False
+        
         # 보스 등장 처리
         if total_score >= 30000:
             explosions = []  # 이전 스테이지의 폭발 효과 제거
@@ -632,6 +681,7 @@ def game_play():
         
         pygame.display.update()
         clock.tick(60)
+
 
 # 게임 시작 화면 호출
 start_screen()
