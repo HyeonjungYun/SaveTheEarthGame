@@ -350,13 +350,13 @@ def create_boss():
     boss_x_pos = (screen_width / 2) - (boss_width / 2)
     boss_y_pos = -boss_height
     boss_speed = 0.2  
-    boss_hp = 50000  # 보스 몬스터 체력
+    boss_hp = 10000  # 보스 몬스터 체력
     return [boss_image, boss_x_pos, boss_y_pos, boss_speed, boss_hp]
 
 # 보스 몬스터 체력 바
 def show_boss_hp(boss):
     x, y, hp = boss[1], boss[2], boss[4]
-    max_hp = 50000  # 보스 몬스터 최대 체력
+    max_hp = 10000  # 보스 몬스터 최대 체력
     bar_x = 50  
     bar_y = 50  
     bar_length = screen_width - 100  # 체력 바의 길이
@@ -382,8 +382,9 @@ def create_boss_rocks(boss_x, boss_y):
 
 # 보스 스테이지
 def boss_stage():
-    global missiles, explosions, total_score, is_game_over, is_game_clear, lives, current_stage, present_score, fighter_x_pos, fighter_y_pos, flash_start_time, flash_duration
-
+    global missiles, explosions, total_score, is_game_over, is_game_clear, lives, current_stage, \
+           present_score, fighter_x_pos, fighter_y_pos, flash_start_time, flash_duration, pierce_count
+    pierce_count=0  
     boss = create_boss()
     boss_appeared = True
     boss_rock_image = pygame.image.load('img/boss_rock.png') 
@@ -453,6 +454,10 @@ def boss_stage():
         fighter_rect = pygame.Rect(fighter_x_pos, fighter_y_pos, fighter_width, fighter_height)
         boss_rect = pygame.Rect(boss[1], boss[2], boss_width, boss_height)
         if fighter_rect.colliderect(boss_rect):
+            is_game_over = True
+            return False
+
+        if boss[2] + boss_height >= screen_height:
             is_game_over = True
             return False
 
