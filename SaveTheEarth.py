@@ -132,7 +132,7 @@ def create_asteroid():
 
 # 게임 오버 화면 출력 함수
 def game_over():
-    global is_game_over, total_score, current_missile_index, current_missile_power, missile_image, missile_width, missile_height, fighter_speed, astoreid_speed_min, astoreid_speed_max, asteroid_frequency, item_generate
+    global is_game_over, total_score, current_missile_index, current_missile_power, missile_image, missile_width, missile_height, fighter_speed, astoreid_speed_min, astoreid_speed_max, asteroid_frequency, item_generate, current_stage
     screen.fill((0, 0, 0))
     font = pygame.font.Font(None, 74)
     text = font.render("Game Over", True, (255, 0, 0))
@@ -164,6 +164,7 @@ def game_over():
                     astoreid_speed_max = 3
                     asteroid_frequency = 3
                     item_generate = 0.15
+                    current_stage = 1
                     return  # 게임 재시작
 
                 elif quit_button.collidepoint(event.pos):
