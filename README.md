@@ -10,8 +10,46 @@
 ### 게임 설명
 - 간단한 슈팅게임으로 지구를 향해 날아오는 운석을 파괴하는 게임입니다.
 - 플레이어는 방향키 좌, 우를 통해 이동할 수 있으며, 스페이스바를 통해 미사일을 발사할 수 있습니다.
-- 일정 시간마다 랜덤으로 생성되는 아이템을 먹어 공격력이 강해지거나 스피드가 빨라질 수 있습니다.(미개발)
-- 스테이지 마다 보스가 나오고 보스를 격파했을 때 다음 스테이지로 넘어갈 수 있습니다. (미개발)
+- 일정 시간마다 랜덤으로 생성되는 아이템을 먹어 공격력이 강해지거나 스피드가 빨라질 수 있습니다.
+- 스테이지 3 마지막에 보스가 나오고 보스를 퇴치하면 게임이 끝납니다.
+
+![upgrade_item](https://github.com/HyeonjungYun/SaveTheEarthGame/assets/58295105/8a28f440-693a-4800-b791-6d91886efbf3)
+
+- 공격력 증가 아이템
+    - 해당 아이템을 획득하면 공격력이 증가합니다. (최대 25)
+    - 
+![speed_item](https://github.com/HyeonjungYun/SaveTheEarthGame/assets/58295105/449c54e8-712a-402d-9257-85aa01d30337)
+
+- 스피드 증가 아이템
+    - 해당 아이템을 획득하면 스피드가 증가합니다. (최대 15)
+    - 
+![pierce_item](https://github.com/HyeonjungYun/SaveTheEarthGame/assets/58295105/e03dc19f-fb50-4649-b6c4-28cc2ca71ed5)
+
+- 관통 증가 아이템
+    - 해당 아이템을 획득하면 발사하는 미사일이 운석을 관통할 수 있으며 아이템을 먹을 때마다 관통 가능한 횟수가 증가합니다. (최대 5)
+    - 
+![heart](https://github.com/HyeonjungYun/SaveTheEarthGame/assets/58295105/e1849809-9ac6-4c98-ba5d-0d584d5e16d5)
+- 라이프 추가 아이템
+    - 플레이어의 라이프 카운트와 동일하게 생겼습니다.
+    - 해당 아이템을 획득하면 플레이어의 라이프 카운트가 1 증가합니다. (최대 5)
+- 아이템들은 각각의 최대치에 도달하면 더 이상 생성되지 않습니다.
+
+ 
+![rock1](https://github.com/HyeonjungYun/SaveTheEarthGame/assets/58295105/388eee0f-6637-43ab-a1d1-a807a7e26bc1)
+![rock3](https://github.com/HyeonjungYun/SaveTheEarthGame/assets/58295105/4bd40fda-a41d-4b2c-bd1c-e24f10ae69e5)
+![rock2](https://github.com/HyeonjungYun/SaveTheEarthGame/assets/58295105/1e164528-c919-42cc-a44c-35ea9b35ada3)
+- 운석들의 HP는 점수가 쌓일수록 점점 증가합니다.
+
+![boss](https://github.com/HyeonjungYun/SaveTheEarthGame/assets/58295105/1d56bed2-4f1f-4ce2-b9ce-5005608d16aa)
+- 게임의 최종 목표는 보스를 퇴치하는 것이며 스테이지 3에서 보스를 퇴치했을 때 게임이 클리어 됩니다.
+- 보스 스테이지에서 보스를 잡지 못 하면 게임이 그대로 종료됩니다.
+
+![boss_rock](https://github.com/HyeonjungYun/SaveTheEarthGame/assets/58295105/1ebaa1e2-d26d-45d1-b26c-a92ac2676f60)
+- 보스는 위의 사진과 같은 구체를 발사하며 해당 구체는 미사일의 공격을 받지 않습니다.
+
+
+
+
 
 ## Contribute & Collaborate
 -------
