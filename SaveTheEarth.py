@@ -112,6 +112,9 @@ asteroid_frequency_max = 100
 # 난이도 상승 기준을 측정하는 변수
 present_score = 0
 
+# 아이템 생성 확률
+item_generate = 0.15
+
 # 운석 생성 함수
 def create_asteroid():
     asteroid_img = pygame.image.load(random.choice(asteroid_images))
@@ -124,7 +127,8 @@ def create_asteroid():
 
 # 게임 오버 화면 출력 함수
 def game_over():
-    global is_game_over, total_score, astoreid_speed_min, astoreid_speed_max, font_s, current_missile_power, missile_width, fighter_speed, asteroid_frequency
+    global is_game_over, total_score, astoreid_speed_min, astoreid_speed_max, font_s, item_generate, \
+        current_missile_power, missile_width, fighter_speed, asteroid_frequency, missile_height
     screen.fill((0, 0, 0))
     font = pygame.font.Font(None, 74)
     text = font.render("Game Over", True, (255, 0, 0))
@@ -157,6 +161,7 @@ def game_over():
                     astoreid_speed_min = 1
                     astoreid_speed_max = 3
                     asteroid_frequency = 3
+                    item_generate = 0.15
                     return  # 게임 재시작
 
                 elif quit_button.collidepoint(event.pos):
@@ -442,7 +447,7 @@ def game_play():
     global missiles, asteroids, explosions, items, fighter_x_pos, fighter_y_pos, is_game_over, is_game_clear, lives, total_score, speed_bonus, \
         fighter_speed, current_missile_index, missile_image, missile_width, missile_height, current_missile_power, \
         astoreid_speed_min, astoreid_speed_max, present_score, asteroid_frequency, asteroid_frequency_min, asteroid_frequency_max, \
-        current_missile_power, current_stage, flash_start_time, flash_duration, pierce_count, boss_rocks
+        current_missile_power, current_stage, flash_start_time, flash_duration, pierce_count, boss_rocks, item_generate
 
     # 우주선 운석 위치 조정 및 재조정
     fighter_x_pos = (screen_width / 2) - (fighter_width / 2)
@@ -462,8 +467,10 @@ def game_play():
         if present_score >= 500:
             if current_stage == 1 and total_score >= 5000:
                 current_stage += 1
+                item_generate = 0.1
             if current_stage == 2 and total_score >= 20000:
                 current_stage += 1
+                item_generate = 0.03
             if astoreid_speed_min <= 20:
                 astoreid_speed_min += 3
                 astoreid_speed_max += 3
@@ -510,7 +517,7 @@ def game_play():
                         asteroids.remove(asteroid)
                         explosions.append([explosion_image, asteroid[1], asteroid[2], pygame.time.get_ticks()])
                         get_score(asteroid[3])
-                        if random.random() < 0.15:  # 15% 확률로 아이템 생성
+                        if random.random() < item_generate:  # 15% 확률로 아이템 생성
                             items.append(create_item(asteroid[1], asteroid[2]))
                     missile[2] -= 1  # 미사일의 남은 관통 횟수 감소
                     if missile[2] < 0:
