@@ -116,14 +116,14 @@ asteroid_frequency_max = 100
 present_score = 0
 
 # 아이템 생성 확률
-item_generate = 0.15
+item_generate = 0.10
 
 # 운석 생성 함수
 def create_asteroid():
     asteroid_img = pygame.image.load(random.choice(asteroid_images))
     asteroid_x_pos = random.randint(0, screen_width - asteroid_img.get_rect().width)
     asteroid_y_pos = 0 - asteroid_img.get_rect().width
-    asteroid_speed = random.randint(1, 3)
+    asteroid_speed = random.randint(astoreid_speed_min, astoreid_speed_max)
     max_hp = 3 + (total_score // 500)  # 운석의 최대 체력 설정
     asteroid_hp = max_hp  # 초기 체력을 최대 체력으로 설정
     return [asteroid_img, asteroid_x_pos, asteroid_y_pos, asteroid_speed, asteroid_hp, max_hp]
@@ -526,25 +526,25 @@ def game_play():
 
     # 게임 실행
     while not is_game_over and not is_game_clear:
-        if present_score >= 500:
+        if present_score >= 1000:
             if current_stage == 1 and total_score >= 5000:
                 current_stage += 1
-                item_generate = 0.1
+                item_generate = 0.07
                 asteroids = []  # 기존 운석 제거
                 stage_clear = True
                 stage_clear_start_time = pygame.time.get_ticks()
             if current_stage == 2 and total_score >= 20000:
                 current_stage += 1
-                item_generate = 0.03
+                item_generate = 0.01
                 asteroids = []  # 기존 운석 제거
                 stage_clear = True
                 stage_clear_start_time = pygame.time.get_ticks()
             if astoreid_speed_min <= 20:
-                astoreid_speed_min += 3
-                astoreid_speed_max += 3
+                astoreid_speed_min += 1
+                astoreid_speed_max += 1
             if asteroid_frequency <= 30:
                 asteroid_frequency += 1
-            present_score = total_score % 500
+            present_score = total_score % 1000
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
