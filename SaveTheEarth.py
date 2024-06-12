@@ -288,8 +288,10 @@ def show_stats():
     font = pygame.font.Font(None, 36)
     attack_power_text = font.render(f"Power: {current_missile_power}", True, (255, 255, 255))
     speed_text = font.render(f"Speed: {fighter_speed}", True, (255, 255, 255))
+    pierce_count_text = font.render(f"Pierce: {pierce_count}", True, (255, 255, 255))
     screen.blit(attack_power_text, (screen_width - attack_power_text.get_width() - 20, 20))
     screen.blit(speed_text, (screen_width - speed_text.get_width() - 20, 60))
+    screen.blit(pierce_count_text, (screen_width - pierce_count_text.get_width() - 20, 100))
 
 # 현재 스테이지 표시
 def show_stage():
