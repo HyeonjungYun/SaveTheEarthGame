@@ -564,13 +564,13 @@ def game_play():
             if fighter_rect.colliderect(item_rect):
                 if item[3] == 'upgrade' and current_missile_power < 30:
                     current_missile_power += 1
-                    missile_index = min(current_missile_power // 10, len(missile_images) - 1)
+                    missile_index = min(current_missile_power // 5, len(missile_images) - 1)
                     missile_image = missile_images[missile_index]
                     missile_size = missile_image.get_rect().size
                     missile_width = missile_size[0]
                     missile_height = missile_size[1]
                 elif item[3] == 'pierce' and pierce_count < 5:
-                    pierce_count += 1  # 관통 횟수 증가
+                    pierce_count += 1  # 관통 횟수 증가 
                 elif item[3] == 'speed' and fighter_speed < 15:
                     fighter_speed += 1
                 elif item[3] == 'life' and lives < 5:
