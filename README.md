@@ -1,7 +1,7 @@
 # SaveTheEarthGame
---------
+
 ## 프로젝트 설명
--------
+
 ### 프로젝트 기획 의도
 - SaveTheEarth는 파이게임을 사용한 슈팅게임입니다.
 - '오픈소스 SW개론' 강의의 과제 제출을 위해 만들어진 프로젝트입니다.
@@ -52,7 +52,7 @@
 
 
 ## Contribute & Collaborate
--------
+
 ### 브랜치 전략 
 1. 기능 추가, 수정, 버그 픽스 등  issue가 발생한다면 issues에 issue를 추가한다.
     - 혹은 기존에 있는 issue를 보고 작업할 issue를 정한다.
@@ -74,3 +74,37 @@
 - Docs ; 주석 수정
 - Style : 기능적 변화 없이 코드를 변경했을 때
 - chore : 그 외
+
+## 실행 방법
+- 다음과 같은 방법으로 게임을 실행 가능하다.
+- 명령 프롬프트를 이용하여 다음 명령어를 차례대로 입력할 수 있다.
+
+### 1. python 및 pip 설치
+- 먼저 python과 pip를 설치한다.
+    - python 설치 : https://www.python.org/downloads/
+    - pip 설치 문서 : https://pip.pypa.io/en/stable/installation/
+- 이후 다음과 같은 명령어를 통해 설치되었는지 확인한다.
+```
+python -V
+```
+```
+pip --version
+``` 
+
+### 2. 레포지토리 클론
+- 해당 레포지토리를 클론하여 필요한 데이터와 파일을 원하는 디렉토리에 세팅한다.
+```
+git clone https://github.com/HyeonjungYun/SaveTheEarthGame.git
+```
+
+### 3. pygame 설치
+- 게임 실행에 필요한 pygame 라이브러리를 다음 명령어를 통해 설치한다.
+```
+pip install pygame
+```
+
+### 4. SaveTheEarth.py 파일 실행
+- 이후 SaveTheEarth.py 파일을 다음과 같은 명령어로 실행한다.
+```
+python SaveTheEarth.py
+```
