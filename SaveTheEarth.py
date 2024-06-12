@@ -685,7 +685,7 @@ def game_play():
                 stage_clear = False
         
         # 보스 등장 처리
-        if total_score >= 0:
+        if total_score >= 30000:
             explosions = []  # 이전 스테이지의 폭발 효과 제거
             if boss_stage():
                 is_game_clear = True
