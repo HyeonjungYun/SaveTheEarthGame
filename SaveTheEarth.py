@@ -350,13 +350,13 @@ def create_boss():
     boss_x_pos = (screen_width / 2) - (boss_width / 2)
     boss_y_pos = -boss_height
     boss_speed = 0.2  
-    boss_hp = 100000  # 보스 몬스터 체력
+    boss_hp = 50000  # 보스 몬스터 체력
     return [boss_image, boss_x_pos, boss_y_pos, boss_speed, boss_hp]
 
 # 보스 몬스터 체력 바
 def show_boss_hp(boss):
     x, y, hp = boss[1], boss[2], boss[4]
-    max_hp = 100000  # 보스 몬스터 최대 체력
+    max_hp = 50000  # 보스 몬스터 최대 체력
     bar_x = 50  
     bar_y = 50  
     bar_length = screen_width - 100  # 체력 바의 길이
@@ -382,7 +382,7 @@ def create_boss_rocks(boss_x, boss_y):
 
 # 보스 스테이지
 def boss_stage():
-    global missiles, explosions, total_score, is_game_over, is_game_clear, lives, current_stage, present_score, fighter_x_pos, fighter_y_pos
+    global missiles, explosions, total_score, is_game_over, is_game_clear, lives, current_stage, present_score, fighter_x_pos, fighter_y_pos, flash_start_time, flash_duration
 
     boss = create_boss()
     boss_appeared = True
@@ -439,6 +439,7 @@ def boss_stage():
             if missile_rect.colliderect(boss_rect):
                 boss[4] -= current_missile_power  # 현재 미사일 파워만큼 보스 몬스터 체력 감소
                 missile[2] -= 1  # 미사일의 남은 관통 횟수 감소
+                explosions.append([explosion_image, missile[0], missile[1], pygame.time.get_ticks()])
                 if missile[2] < 0:
                     missiles.remove(missile)
                 if boss[4] <= 0:
@@ -457,7 +458,7 @@ def boss_stage():
 
         # 전투기와 보스 공격 충돌 처리
         for attack in boss_attacks:
-            for attack in boss_attacks:attack_rect = pygame.Rect(attack[1], attack[2], attack[0].get_rect().width, attack[0].get_rect().height)
+            attack_rect = pygame.Rect(attack[1] + 10, attack[2] + 10, attack[0].get_rect().width - 20, attack[0].get_rect().height - 20)
             if fighter_rect.colliderect(attack_rect):
                 lives -= 1  
                 boss_attacks.remove(attack)
@@ -466,6 +467,9 @@ def boss_stage():
                     is_game_over = True
                     return False
         
+        # 폭발 효과 시간 관리
+        current_time = pygame.time.get_ticks()
+        explosions = [explosion for explosion in explosions if current_time - explosion[3] < 500]
 
         # 화면 그리기
         screen.blit(background, (0, 0))
@@ -489,8 +493,17 @@ def boss_stage():
         for i in range(lives):
             screen.blit(heart_image, (10 + i * (heart_width + 10), 10))
 
+        # 충돌 시각적 효과
+        if flash_start_time and current_time - flash_start_time < flash_duration:
+            flash_alpha = 128 * (1 - (current_time - flash_start_time) / flash_duration)  # 반투명 효과로 변경 (기존 255에서 128로 변경)
+            flash_surface = pygame.Surface((screen_width, screen_height))
+            flash_surface.set_alpha(flash_alpha)
+            flash_surface.fill((255, 0, 0))  # 붉은 색으로 플래시 효과
+            screen.blit(flash_surface, (0, 0))
+
         pygame.display.update()
         clock.tick(60)
+
 
 
 # 게임 플레이
@@ -672,7 +685,7 @@ def game_play():
                 stage_clear = False
         
         # 보스 등장 처리
-        if total_score >= 30000:
+        if total_score >= 0:
             explosions = []  # 이전 스테이지의 폭발 효과 제거
             if boss_stage():
                 is_game_clear = True
