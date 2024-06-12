@@ -19,7 +19,9 @@ pygame.display.set_caption("PyShooting: 지구를 지켜라")
 clock = pygame.time.Clock()
 
 # 배경 이미지
-background = pygame.image.load('img/background.png')
+background1 = pygame.image.load('img/background1.png')
+background2 = pygame.image.load('img/background2.png')
+background3 = pygame.image.load('img/background3.png')
 
 # 전투기 이미지
 fighter = pygame.image.load('img/fighter.png')
@@ -477,7 +479,7 @@ def boss_stage():
         explosions = [explosion for explosion in explosions if current_time - explosion[3] < 500]
 
         # 화면 그리기
-        screen.blit(background, (0, 0))
+        screen.blit(background3, (0, 0))
         screen.blit(fighter, (fighter_x_pos, fighter_y_pos))
 
         for missile in missiles:
@@ -530,6 +532,7 @@ def game_play():
     flash_start_time = None  # 플래시 효과 초기화
     pierce_count = 1  # 관통력 초기화
     boss_rocks = []  # 보스의 원거리 공격 리스트 초기화
+    map_changer = 0 #맵변경변
 
     # 게임 실행
     while not is_game_over and not is_game_clear:
@@ -540,12 +543,14 @@ def game_play():
                 asteroids = []  # 기존 운석 제거
                 stage_clear = True
                 stage_clear_start_time = pygame.time.get_ticks()
+                map_changer = 1
             if current_stage == 2 and total_score >= 20000:
                 current_stage += 1
                 item_generate = 0.01
                 asteroids = []  # 기존 운석 제거
                 stage_clear = True
                 stage_clear_start_time = pygame.time.get_ticks()
+                map_changer = 2
             if astoreid_speed_min <= 20:
                 astoreid_speed_min += 1
                 astoreid_speed_max += 1
@@ -640,7 +645,12 @@ def game_play():
                 break
  
          # 화면 그리기
-        screen.blit(background, (0, 0))
+        if map_changer == 0:
+            screen.blit(background1, (0, 0))
+        if map_changer == 1:
+            screen.blit(background2, (0, 0))
+        if map_changer == 2:
+            screen.blit(background3, (0, 0))
         screen.blit(fighter, (fighter_x_pos, fighter_y_pos))
 
         for missile in missiles:
