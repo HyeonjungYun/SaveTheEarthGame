@@ -25,8 +25,8 @@
     - 
 ![pierce_item](https://github.com/HyeonjungYun/SaveTheEarthGame/assets/58295105/e03dc19f-fb50-4649-b6c4-28cc2ca71ed5)
 
-- 관통 증가 아이템
-    - 해당 아이템을 획득하면 발사하는 미사일이 운석을 관통할 수 있으며 아이템을 먹을 때마다 관통 가능한 횟수가 증가합니다. (최대 5)
+- 히트 증가 아이템
+    - 해당 아이템을 획득하면 발사하는 미사일이 운석을 다단히트할 수 있으며 아이템을 먹을 때마다 다단히트 가능한 횟수가 증가합니다. (최대 5)
     - 
 ![heart](https://github.com/HyeonjungYun/SaveTheEarthGame/assets/58295105/e1849809-9ac6-4c98-ba5d-0d584d5e16d5)
 - 라이프 추가 아이템
