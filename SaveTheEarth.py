@@ -411,10 +411,15 @@ def boss_stage():
 
         # 전투기와 보스 공격 충돌 처리
         for attack in boss_attacks:
-            attack_rect = pygame.Rect(attack[1], attack[2], attack[0].get_rect().width, attack[0].get_rect().height)
+            for attack in boss_attacks:attack_rect = pygame.Rect(attack[1], attack[2], attack[0].get_rect().width, attack[0].get_rect().height)
             if fighter_rect.colliderect(attack_rect):
-                is_game_over = True
-                return False
+                lives -= 1  
+                boss_attacks.remove(attack)
+                flash_start_time = pygame.time.get_ticks()
+                if lives <= 0:  
+                    is_game_over = True
+                    return False
+        
 
         # 화면 그리기
         screen.blit(background, (0, 0))
