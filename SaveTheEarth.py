@@ -259,15 +259,30 @@ def draw_HPbar(x, y, hp, max_hp):
 
 # 아이템 생성 함수
 def create_item(x, y):
-    item_type = random.choice(['upgrade', 'pierce', 'speed', 'life'])
-    if item_type == 'upgrade':
-        return [upgrade_item_image, x, y, 'upgrade']
-    elif item_type == 'pierce':
-        return [pierce_item_image, x, y, 'pierce']
-    elif item_type == 'speed':
-        return [speed_item_image, x, y, 'speed']
-    elif item_type == 'life':
-        return [life_item_image, x, y, 'life']
+    global current_missile_power, fighter_speed, pierce_count, lives
+    possible_items = []
+    if current_missile_power < 30:
+        possible_items.append('upgrade')
+    if pierce_count < 5:
+        possible_items.append('pierce')
+    if fighter_speed < 15:
+        possible_items.append('speed')
+    if lives < 5:
+        possible_items.append('life')
+
+    if possible_items:
+        item_type = random.choice(possible_items)
+        if item_type == 'upgrade':
+            return [upgrade_item_image, x, y, 'upgrade']
+        elif item_type == 'pierce':
+            return [pierce_item_image, x, y, 'pierce']
+        elif item_type == 'speed':
+            return [speed_item_image, x, y, 'speed']
+        elif item_type == 'life':
+            return [life_item_image, x, y, 'life']
+    else:
+        return None  # 생성 가능한 아이템이 없으면 None 반환
+
 
 # 현재 공격력과 속도 표시
 def show_stats():
@@ -539,28 +554,31 @@ def game_play():
         items = [[i[0], i[1], i[2] + 3, i[3]] for i in items if i[2] < screen_height]
 
         # 아이템과 전투기 충돌 처리
-        for item in items:
+        for item in items[:]:
+            if item is None:
+                items.remove(item)
+                continue
+            
             fighter_rect = pygame.Rect(fighter_x_pos, fighter_y_pos, fighter_width, fighter_height)
             item_rect = pygame.Rect(item[1], item[2], item[0].get_rect().width, item[0].get_rect().height)
             if fighter_rect.colliderect(item_rect):
-                if item[3] == 'upgrade':
+                if item[3] == 'upgrade' and current_missile_power < 30:
                     current_missile_power += 1
-                    missile_index = min(current_missile_power // 10, len(missile_images) - 1)
+                    missile_index = min(current_missile_power // 5, len(missile_images) - 1)
                     missile_image = missile_images[missile_index]
                     missile_size = missile_image.get_rect().size
                     missile_width = missile_size[0]
                     missile_height = missile_size[1]
-                elif item[3] == 'pierce':
-                    pierce_count += 1  # 관통 횟수 증가
-                elif item[3] == 'speed':
+                elif item[3] == 'pierce' and pierce_count < 5:
+                    pierce_count += 1  # 관통 횟수 증가 
+                elif item[3] == 'speed' and fighter_speed < 15:
                     fighter_speed += 1
-                elif item[3] == 'life':
-                    if lives < 5:
-                        lives += 1
+                elif item[3] == 'life' and lives < 5:
+                    lives += 1
                 items.remove(item)
                 break
-
-        # 화면 그리기
+ 
+         # 화면 그리기
         screen.blit(background, (0, 0))
         screen.blit(fighter, (fighter_x_pos, fighter_y_pos))
 
